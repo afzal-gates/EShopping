@@ -14,7 +14,6 @@ public class DiscountGrpcService
     public async Task<CouponModel> GetDiscount(string productName)
     {
         var discountRequest = new GetDiscountRequest {ProductName = productName};
-        var dd = _discountProtoServiceClient.GetDiscount(discountRequest);
-        return dd;
+        return await _discountProtoServiceClient.GetDiscountAsync(discountRequest);
     }
 }
