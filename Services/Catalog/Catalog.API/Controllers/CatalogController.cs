@@ -113,9 +113,7 @@ public class CatalogController : ApiController
         CancellationToken cancellationToken)
     {
         var cacheKey = await cacheService.GenerateCacheKeyFromRequest(httpContextAccessor.HttpContext.Request);
-        var response = await cacheService.GetDataAsync<IList<BrandResponse>>(
-            cacheKey,
-            cancellationToken);
+        var response = await cacheService.GetDataAsync<IList<BrandResponse>>(cacheKey, cancellationToken);
 
         if (response is not null)
         {
