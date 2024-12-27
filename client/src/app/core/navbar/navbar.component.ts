@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AcntService } from 'src/app/account/acnt.service';
 import { BasketService } from 'src/app/basket/basket.service';
 import { IBasketItem } from 'src/app/shared/models/basket';
+import { TestBed, async } from '@angular/core/testing';
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +10,7 @@ import { IBasketItem } from 'src/app/shared/models/basket';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+
   constructor(public basketService: BasketService, private acntService: AcntService){}
   ngOnInit(): void {
 

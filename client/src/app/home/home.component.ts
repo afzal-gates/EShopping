@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IGallary } from '../shared/models/gallary';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -8,7 +9,21 @@ import { IGallary } from '../shared/models/gallary';
 })
 export class HomeComponent {
 
+  descriptionPath : string = "index.html";
+  projectDescription : string = "";
   images: IGallary[] = [];
+
+  constructor(private http: HttpClient)
+  {
+      this.http
+          .get('assets/indexBuilder/' + this.descriptionPath,
+              { responseType: 'text' })
+          .subscribe(data => {
+              this.projectDescription = data;
+          }
+      );
+  }
+
 
   ngOnInit(): void {
     this.getGallaries();

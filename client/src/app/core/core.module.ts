@@ -8,7 +8,8 @@ import { ServerErrorComponent } from './server-error/server-error.component';
 import { HeaderComponent } from './header/header.component';
 import { BreadcrumbModule } from 'xng-breadcrumb';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
+// import { MatToolbarModule, MatSidenavModule, MatListModule, MatButtonModule, MatIconModule } from "@angular/material";
+// import { FlexLayoutModule } from "@angular/flex-layout";
 
 
 @NgModule({
@@ -23,7 +24,13 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     CommonModule,
     RouterModule,
     BreadcrumbModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    // MatToolbarModule,
+    // MatSidenavModule,
+    // MatListModule,
+    // MatIconModule,
+    // MatButtonModule,
+    // FlexLayoutModule
   ],
   exports:[
     NavbarComponent,
