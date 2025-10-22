@@ -159,4 +159,72 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
             .Find(t => true)
             .ToListAsync();
     }
+
+    // Product Variation methods
+    public async Task<ProductVariation> AddProductVariation(string productId, ProductVariation variation)
+    {
+        variation.Id = ObjectId.GenerateNewId().ToString();
+        variation.ProductId = productId;
+
+        var filter = Builders<Product>.Filter.Eq(p => p.Id, productId);
+        var update = Builders<Product>.Update
+            .Push(p => p.Variations, variation)
+            .Set(p => p.HasVariations, true);
+
+        var result = await _context.Products.UpdateOneAsync(filter, update);
+
+        return result.IsAcknowledged && result.ModifiedCount > 0 ? variation : null;
+    }
+
+    public async Task<bool> UpdateProductVariation(string productId, ProductVariation variation)
+    {
+        var product = await GetProduct(productId);
+        if (product == null) return false;
+
+        var existingVariationIndex = product.Variations.FindIndex(v => v.Id == variation.Id);
+        if (existingVariationIndex == -1) return false;
+
+        product.Variations[existingVariationIndex] = variation;
+        return await UpdateProduct(product);
+    }
+
+    public async Task<bool> DeleteProductVariation(string productId, string variationId)
+    {
+        var filter = Builders<Product>.Filter.Eq(p => p.Id, productId);
+        var update = Builders<Product>.Update.PullFilter(p => p.Variations, v => v.Id == variationId);
+
+        var result = await _context.Products.UpdateOneAsync(filter, update);
+
+        // Check if product still has variations and update HasVariations flag
+        if (result.IsAcknowledged && result.ModifiedCount > 0)
+        {
+            var product = await GetProduct(productId);
+            if (product.Variations.Count == 0)
+            {
+                var updateFlag = Builders<Product>.Update.Set(p => p.HasVariations, false);
+                await _context.Products.UpdateOneAsync(filter, updateFlag);
+            }
+        }
+
+        return result.IsAcknowledged && result.ModifiedCount > 0;
+    }
+
+    public async Task<IEnumerable<ProductVariation>> GetProductVariations(string productId)
+    {
+        var product = await GetProduct(productId);
+        return product?.Variations ?? new List<ProductVariation>();
+    }
+
+    public async Task<ProductVariation> GetProductVariationById(string productId, string variationId)
+    {
+        var product = await GetProduct(productId);
+        return product?.Variations.FirstOrDefault(v => v.Id == variationId);
+    }
+
+    public async Task<ProductVariation> GetProductVariationBySKU(string sku)
+    {
+        var filter = Builders<Product>.Filter.ElemMatch(p => p.Variations, v => v.SKU == sku);
+        var product = await _context.Products.Find(filter).FirstOrDefaultAsync();
+        return product?.Variations.FirstOrDefault(v => v.SKU == sku);
+    }
 }

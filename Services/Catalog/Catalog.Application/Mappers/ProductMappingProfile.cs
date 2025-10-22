@@ -15,5 +15,10 @@ public class ProductMappingProfile : Profile
         CreateMap<ProductBrand, BrandResponse>().ReverseMap();
         CreateMap<ProductType, TypesResponse>().ReverseMap();
         CreateMap<Pagination<Product>, Pagination<ProductResponse>>().ReverseMap();
+
+        // Product Variation mappings
+        CreateMap<ProductVariation, ProductVariationResponse>().ReverseMap();
+        CreateMap<AddProductVariationCommand, ProductVariation>().ReverseMap();
+        CreateMap<UpdateProductVariationCommand, ProductVariation>().ReverseMap();
     }
 }

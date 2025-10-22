@@ -14,4 +14,10 @@ public class Product : BaseEntity
     public ProductType Types { get; set; }
     [BsonRepresentation(BsonType.Decimal128)]
     public decimal Price { get; set; }
+
+    [BsonElement("Variations")]
+    public List<ProductVariation> Variations { get; set; } = new List<ProductVariation>();
+
+    [BsonElement("HasVariations")]
+    public bool HasVariations { get; set; } = false;
 }

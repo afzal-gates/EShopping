@@ -218,4 +218,96 @@ public class CatalogController : ApiController
         await cacheService.RemoveDataAsync(cacheKey, cancellationToken);
         return Ok(result);
     }
+
+    // Product Variation Endpoints
+    [HttpGet]
+    [Route("{productId}/variations", Name = "GetProductVariations")]
+    [ProducesResponseType(typeof(IList<ProductVariationResponse>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<IList<ProductVariationResponse>>> GetProductVariations(string productId)
+    {
+        var query = new GetProductVariationsQuery(productId);
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("{productId}/variations/{variationId}", Name = "GetProductVariationById")]
+    [ProducesResponseType(typeof(ProductVariationResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<ProductVariationResponse>> GetProductVariationById(string productId, string variationId)
+    {
+        var query = new GetProductVariationByIdQuery(productId, variationId);
+        var result = await _mediator.Send(query);
+        return result != null ? Ok(result) : NotFound();
+    }
+
+    [HttpGet]
+    [Route("variations/sku/{sku}", Name = "GetProductVariationBySKU")]
+    [ProducesResponseType(typeof(ProductVariationResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<ProductVariationResponse>> GetProductVariationBySKU(string sku)
+    {
+        var query = new GetProductVariationBySKUQuery(sku);
+        var result = await _mediator.Send(query);
+        return result != null ? Ok(result) : NotFound();
+    }
+
+    [HttpPost]
+    [Route("{productId}/variations", Name = "AddProductVariation")]
+    [ProducesResponseType(typeof(ProductVariationResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<ProductVariationResponse>> AddProductVariation(
+        string productId,
+        [FromBody] AddProductVariationCommand command,
+        IRedisCacheService cacheService,
+        CancellationToken cancellationToken)
+    {
+        command.ProductId = productId;
+        var result = await _mediator.Send(command);
+
+        // Invalidate product cache to reflect the new variation
+        var cacheKey = $"product_{productId}";
+        await cacheService.RemoveDataAsync(cacheKey, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("{productId}/variations/{variationId}", Name = "UpdateProductVariation")]
+    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> UpdateProductVariation(
+        string productId,
+        string variationId,
+        [FromBody] UpdateProductVariationCommand command,
+        IRedisCacheService cacheService,
+        CancellationToken cancellationToken)
+    {
+        command.ProductId = productId;
+        command.VariationId = variationId;
+        var result = await _mediator.Send(command);
+
+        // Invalidate product cache to reflect the updated variation
+        var cacheKey = $"product_{productId}";
+        await cacheService.RemoveDataAsync(cacheKey, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    [Route("{productId}/variations/{variationId}", Name = "DeleteProductVariation")]
+    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> DeleteProductVariation(
+        string productId,
+        string variationId,
+        IRedisCacheService cacheService,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteProductVariationCommand { ProductId = productId, VariationId = variationId };
+        var result = await _mediator.Send(command);
+
+        // Invalidate product cache to reflect the deleted variation
+        var cacheKey = $"product_{productId}";
+        await cacheService.RemoveDataAsync(cacheKey, cancellationToken);
+
+        return Ok(result);
+    }
 }
