@@ -17,4 +17,6 @@ public class ProductResponse
     public decimal Price { get; set; }
     public ProductBrand Brands { get; set; }
     public ProductType Types { get; set; }
+    public List<ProductVariationResponse> Variations { get; set; } = new List<ProductVariationResponse>();
+    public bool HasVariations { get; set; }
 }

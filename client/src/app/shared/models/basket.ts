@@ -4,6 +4,12 @@ export interface IBasketItem {
   price: number;
   productId: string;
   productName: string;
+  // Product Variation support
+  variationId?: string;
+  sku?: string;
+  size?: string;
+  color?: string;
+  material?: string;
 }
 
 export interface IBasket {

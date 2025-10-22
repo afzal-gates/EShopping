@@ -12,4 +12,12 @@ public interface IProductRepository
     Task<Product> CreateProduct(Product product);
     Task<bool> UpdateProduct(Product product);
     Task<bool> DeleteProduct(string id);
+
+    // Product Variation methods
+    Task<ProductVariation> AddProductVariation(string productId, ProductVariation variation);
+    Task<bool> UpdateProductVariation(string productId, ProductVariation variation);
+    Task<bool> DeleteProductVariation(string productId, string variationId);
+    Task<IEnumerable<ProductVariation>> GetProductVariations(string productId);
+    Task<ProductVariation> GetProductVariationById(string productId, string variationId);
+    Task<ProductVariation> GetProductVariationBySKU(string sku);
 }
